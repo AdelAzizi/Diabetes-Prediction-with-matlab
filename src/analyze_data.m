@@ -32,6 +32,30 @@ function analyze_data(data)
     title('نقشه حرارتی همبستگی بین ویژگی‌ها');
     drawnow;
     
+    %% ۴. رسم نمودار BoxPlot
+    figure('Name', 'Box Plot Analysis', 'Color', 'w');
+    features = data.Properties.VariableNames(1:end-1);
+    
+    % رسم BoxPlot برای تمام ویژگی‌ها
+    subplot(2, 1, 1);
+    boxplot(data{:, 1:end-1});
+    title('Box Plot کلیه ویژگی‌ها');
+    xlabel('ویژگی‌ها');
+    ylabel('مقادیر');
+    xticklabels(features);
+    xtickangle(45);
+    
+    % رسم BoxPlot جداگانه برای هر ویژگی
+    subplot(2, 1, 2);
+    for i = 1:length(features)
+        subplot(3, 3, i);
+        boxplot(data{:, i});
+        title(features{i});
+        axis tight;
+    end
+    sgtitle('Box Plotهای جداگانه برای هر ویژگی');
+    drawnow;
+    
     disp('✅ نمودارهای تحلیل داده رسم شدند.');
     disp(' ');
 end
