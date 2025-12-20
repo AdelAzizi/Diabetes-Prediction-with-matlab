@@ -7,9 +7,9 @@ function finalModel = optimize_model(modelName, X_train, Y_train)
     disp('   (در حال پیدا کردن بهترین تنظیمات...)');
     disp('-----------------------------------------');
     
-    % تنظیمات: تعداد تکرار را روی ۱۰ می‌گذاریم که سریع باشد
+    % تنظیمات: تعداد تکرار را افزایش می‌دهیم برای دقت بیشتر
     opts = struct('Optimizer', 'bayesopt', 'ShowPlots', false, ...
-                  'MaxObjectiveEvaluations', 10, 'Verbose', 0);
+                  'MaxObjectiveEvaluations', 50, 'Verbose', 0);
     
     switch modelName
         case 'KNN'
