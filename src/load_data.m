@@ -1,38 +1,47 @@
 function dataTable = load_data(filePath)
-    % LOAD_DATA فایل CSV را می‌خواند و هدرهای مناسب را به آن اختصاص می‌دهد.
-    %
-    % ورودی:
-    %   filePath: مسیر فایل CSV (رشته متنی)
-    %
-    % خروجی:
-    %   dataTable: جدول داده‌های بارگذاری شده در متلب
+    % LOAD_DATA فایل CSV را می‌خواند و در صورت نیاز داده‌ها را دانلود می‌کند
     
-    % ۱. بررسی وجود فایل
+    % بررسی وجود فایل و دانلود در صورت نیاز
     if ~isfile(filePath)
-        error('خطا: فایل داده در مسیر زیر پیدا نشد:\n%s', filePath);
+        fprintf('فایل داده یافت نشد. در حال دانلود...\n');
+        download_data(filePath);
     end
     
     fprintf('در حال خواندن داده‌ها از: %s ...\n', filePath);
-
-    % ۲. تعریف نام ستون‌ها (چون فایل اصلی هدر ندارد یا ممکن است ناقص باشد)
-    varNames = {'Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', ...
-                'Insulin', 'BMI', 'DiabetesPedigree', 'Age', 'Outcome'};
-
-    % ۳. خواندن فایل با readtable
-    % نکته: 'ReadVariableNames', false یعنی سطر اول داده است، نه تیتر
-    opts = detectImportOptions(filePath);
-    opts.VariableNamesLine = 0; % فایل هدر ندارد
-    opts.PreserveVariableNames = true;
     
-    dataTable = readtable(filePath, opts);
-    
-    % ۴. اطمینان از اینکه تعداد ستون‌ها با نام‌ها برابر است
-    if width(dataTable) == length(varNames)
-        dataTable.Properties.VariableNames = varNames;
-    else
-        warning('تعداد ستون‌های فایل با تعداد نام‌های تعریف شده همخوانی ندارد.');
-    end
+    % خواندن مستقیم فایل با هدرهای موجود
+    dataTable = readtable(filePath);
     
     fprintf('داده‌ها با موفقیت بارگذاری شدند. ابعاد: %d سطر و %d ستون.\n', ...
             height(dataTable), width(dataTable));
+end
+
+function download_data(filePath)
+    % دانلود فایل داده از لینک عمومی
+    url = 'https://raw.githubusercontent.com/jbrownlee/Datasets/master/pima-indians-diabetes.data.csv';
+    
+    fprintf('در حال دانلود فایل از: %s\n', url);
+    
+    websave(filePath, url);
+    fprintf('فایل داده با موفقیت دانلود شد.\n');
+    
+    % اضافه کردن هدر به فایل دانلود شده
+    add_headers_to_file(filePath);
+end
+
+function add_headers_to_file(filePath)
+    % اضافه کردن هدر به فایل CSV
+    fid = fopen(filePath, 'r');
+    data = textscan(fid, '%s', 'Delimiter', '\n');
+    fclose(fid);
+    
+    % اضافه کردن هدر در ابتدای داده‌ها
+    header = 'Pregnancies,Glucose,BloodPressure,SkinThickness,Insulin,BMI,DiabetesPedigree,Age,Outcome';
+    newData = [header; data{1}];
+    
+    fid = fopen(filePath, 'w');
+    for i = 1:length(newData)
+        fprintf(fid, '%s\n', newData{i});
+    end
+    fclose(fid);
 end
